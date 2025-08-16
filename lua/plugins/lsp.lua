@@ -13,7 +13,7 @@ return {
 			-- Lua 言語サーバー設定
 			lspconfig.lua_ls.setup({
 				capabilities = capabilities,
-				cmd = { "C:/tools/lua-language-server-3.7.4-win32-x64/bin/lua-language-server.exe" },
+				cmd = { "lua-language-server.exe" },
 				root_dir = function(fname)
 					return util.root_pattern(".git", "init.lua", ".luarc.json", ".luarc.jsonc")(fname)
 					or vim.fn.stdpath("config")
