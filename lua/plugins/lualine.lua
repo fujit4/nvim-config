@@ -4,7 +4,7 @@ return {
   config = function()
     require("lualine").setup({
       options = {
-        theme = "gruvbox-material",
+        theme = "catppuccin",
         icons_enabled = false,  -- リガチャ・アイコン不要のため
         component_separators = { left = "│", right = "│" },
         section_separators = { left = "", right = "" },
