@@ -25,7 +25,24 @@ return {
         ["<C-f>"] = cmp.mapping.scroll_docs(4),
         ["<C-Space>"] = cmp.mapping.complete(),
         ["<C-e>"] = cmp.mapping.abort(),
-        ["<CR>"] = cmp.mapping.confirm({ select = true }), -- Enterで確定
+        ["<Tab>"] = cmp.mapping.confirm({ select = true }), -- Tabで確定
+		-- Tabで補完候補を「選択していれば」確定にしたい場合は下記
+		-- --------------------------------------------------------
+		-- ['<Tab>'] = cmp.mapping(function(fallback)
+		-- 	if cmp.visible() and cmp.get_selected_entry() then
+		-- 		cmp.confirm({ select = false })  -- ←ここが重要
+		-- 	else
+		-- 		fallback()
+		-- 	end
+		-- end, { 'i', 's' }),
+		-- 以上 ---------------------------------------------------
+		['<CR>'] = cmp.mapping(function(fallback)
+			if cmp.visible() and cmp.get_selected_entry() then
+				cmp.confirm({ select = false })  -- ←ここが重要
+			else
+				fallback()
+			end
+		end, { 'i', 's' }),
       }),
       sources = cmp.config.sources({
         { name = "nvim_lsp" },
