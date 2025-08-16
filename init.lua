@@ -34,3 +34,18 @@ end, { noremap = true, silent = true })
 
 vim.api.nvim_set_keymap("v", "<C-c>", '"+y', { noremap = true, silent = true })
 
+--
+vim.keymap.set("n", "<C-s>", ":w<CR>", {noremap = true, silent = true })
+
+-- ctrl sでカーソル位置を保ったまま、ファイル保存
+vim.keymap.set("i", "<C-s>", function()
+  -- 現在のカーソル位置を記憶
+  local cursor_pos = vim.api.nvim_win_get_cursor(0)
+
+  -- 保存コマンドを実行
+  vim.cmd("write")
+
+  -- 以前のカーソル位置に戻す
+  vim.api.nvim_win_set_cursor(0, cursor_pos)
+
+end, { noremap = true, silent = true, desc = "Save without leaving insert mode" })
