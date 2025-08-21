@@ -13,6 +13,7 @@ vim.o.swapfile = false
 vim.o.ambiwidth = 'single'
 vim.o.wrap = false
 vim.opt.whichwrap:append("<,>,h,l,[,]")
+vim.o.guifont = 'PlemolJP HSNF'
 
 -- 環境変数から `XDG_CONFIG_HOME` を取得して `runtimepath` に lazy.nvim を追加
 local config_home = vim.env.XDG_CONFIG_HOME or vim.fn.stdpath('config')
