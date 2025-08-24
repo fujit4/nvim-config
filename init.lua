@@ -22,6 +22,14 @@ vim.opt.rtp:prepend(config_home .. '/nvim/lazy/lazy.nvim')
 -- -- lazy.nvim 読み込み
 require('lazy').setup('plugins')
 
+-- 挿入モードに入ったとき IME をオフにする
+vim.api.nvim_create_autocmd("InsertLeave", {
+  callback = function()
+    -- zenhan.exe を呼び出す（非同期で実行）
+    vim.fn.jobstart({ "zenhan.exe", "0" })  -- "0" が IME OFF
+  end,
+})
+
 -- ctrl v でpasteモードにして貼り付けてnopasteに戻す
 vim.keymap.set("i", "<C-v>", function()
   -- pasteモードを一時的に有効にする
