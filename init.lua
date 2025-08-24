@@ -59,3 +59,23 @@ vim.keymap.set("i", "<C-s>", function()
   vim.api.nvim_win_set_cursor(0, cursor_pos)
 
 end, { noremap = true, silent = true, desc = "Save without leaving insert mode" })
+
+
+if vim.g.goneovim then
+	-- 太字禁止設定
+	vim.api.nvim_set_hl(0, "Bold", { bold = false })
+
+	-- 全ハイライトから bold を除去
+	vim.api.nvim_create_autocmd("ColorScheme", {
+		callback = function()
+			for _, group in ipairs(vim.fn.getcompletion("", "highlight")) do
+				local hl = vim.api.nvim_get_hl(0, { name = group })
+				if hl.bold then
+					hl.bold = false
+					vim.api.nvim_set_hl(0, group, hl)
+				end
+			end
+		end,
+	})
+end
+
