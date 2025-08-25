@@ -13,7 +13,7 @@ vim.o.swapfile = false
 vim.o.ambiwidth = 'single'
 vim.o.wrap = false
 vim.opt.whichwrap:append("<,>,h,l,[,]")
-vim.o.guifont = 'PlemolJP HSNF'
+vim.o.guifont = 'PlemolJP HSNF:h12'
 
 -- 環境変数から `XDG_CONFIG_HOME` を取得して `runtimepath` に lazy.nvim を追加
 local config_home = vim.env.XDG_CONFIG_HOME or vim.fn.stdpath('config')
@@ -59,6 +59,46 @@ vim.keymap.set("i", "<C-s>", function()
   vim.api.nvim_win_set_cursor(0, cursor_pos)
 
 end, { noremap = true, silent = true, desc = "Save without leaving insert mode" })
+
+-- フォントサイズを増減するユーティリティ
+local function font_size_change(delta)
+  local guifont = vim.o.guifont
+  if guifont == nil or guifont == "" then
+	print 'not defined default "guifont" setting'
+	return
+  end
+
+  -- 例: "PlemolJP Console NF:h12,b" のような表記を想定
+  local name, size, tail = guifont:match("^(.-):h(%d+%.?%d*)(.*)$")
+  if not name then
+    -- サイズ指定がない場合は :h12 を仮定
+    name, size, tail = guifont, "12", ""
+  end
+
+  local new_size = tonumber(size) + delta
+  if new_size < 6 then new_size = 6 end  -- 下限を適当にガード
+
+  vim.o.guifont = string.format("%s:h%s%s", name, new_size, tail or "")
+end
+
+vim.api.nvim_create_user_command("FontSizeUp", function()
+  font_size_change(1)
+end, {})
+
+vim.api.nvim_create_user_command("FontSizeDown", function()
+  font_size_change(-1)
+end, {})
+
+
+-- Ctrl +（= キー）でフォントサイズを +1
+vim.keymap.set({ "n", "i", "v", "c" }, "<C-;>", function()
+  font_size_change(1)
+end, { desc = "Increase GUI font size by 1pt", silent = true })
+
+-- Ctrl - で -1 
+vim.keymap.set({ "n", "i", "v", "c" }, "<C-->", function()
+  font_size_change(-1)
+end, { desc = "Decrease GUI font size by 1pt", silent = true })
 
 
 if vim.g.goneovim then
