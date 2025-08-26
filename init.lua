@@ -95,8 +95,8 @@ vim.api.nvim_create_user_command("FontSizeDown", function()
 end, {})
 
 
--- Ctrl +（= キー）でフォントサイズを +1
-vim.keymap.set({ "n", "i", "v", "c" }, "<C-;>", function()
+-- Ctrl + でフォントサイズを +1
+vim.keymap.set({ "n", "i", "v", "c" }, "<C-S-;>", function()
   font_size_change(1)
 end, { desc = "Increase GUI font size by 1pt", silent = true })
 
