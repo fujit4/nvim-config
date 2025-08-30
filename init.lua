@@ -105,22 +105,5 @@ vim.keymap.set({ "n", "i", "v", "c" }, "<C-->", function()
   font_size_change(-1)
 end, { desc = "Decrease GUI font size by 1pt", silent = true })
 
-
-if vim.g.goneovim then
-	-- 太字禁止設定
-	vim.api.nvim_set_hl(0, "Bold", { bold = false })
-
-	-- 全ハイライトから bold を除去
-	vim.api.nvim_create_autocmd("ColorScheme", {
-		callback = function()
-			for _, group in ipairs(vim.fn.getcompletion("", "highlight")) do
-				local hl = vim.api.nvim_get_hl(0, { name = group })
-				if hl.bold then
-					hl.bold = false
-					vim.api.nvim_set_hl(0, group, hl)
-				end
-			end
-		end,
-	})
-end
+require("markdown_utils")
 
