@@ -6,32 +6,34 @@ local function get_indent(line)
   return line:match("^(%s*)") or ""
 end
 
--- 1行処理: リスト追加
-local function process_add_list(line)
-  local indent = get_indent(line)
-  if not line:match("^%s*%-") then
+-- 1行処理: リスト項目をトグル
+local function process_toggle_list(line)
+  if line:match("^%s*%- ") then
+    return (line:gsub("^(%s*)%- ", "%1"))
+  else
+    local indent = get_indent(line)
     return indent .. "- " .. line:gsub("^%s*", "")
   end
-  return line
 end
 
--- 1行処理: チェックボックス追加
-local function process_add_checkbox(line)
-  local indent = get_indent(line)
-  if not line:match("^%s*%- %[.%]") then
+-- 1行処理: チェックボックスの存在をトグル
+local function process_toggle_checkbox_presence(line)
+  if line:match("^%s*%- %[[ x]%] ") then
+    return (line:gsub("^(%s*)%- %[[ x]%] ", "%1"))
+  else
+    local indent = get_indent(line)
     return indent .. "- [ ] " .. line:gsub("^%s*", "")
   end
-  return line
 end
 
--- 1行処理: チェックボックストグル
-local function process_toggle_checkbox(line)
-  local indent = get_indent(line)
+-- 1行処理: チェックボックスの状態をトグル
+local function process_toggle_checkbox_state(line)
   if line:match("^%s*%- %[ %]") then
     return (line:gsub("^(%s*%-) %[ %]", "%1 [x]"))
   elseif line:match("^%s*%- %[x%]") then
     return (line:gsub("^(%s*%-) %[x%]", "%1 [ ]"))
   else
+    local indent = get_indent(line)
     return indent .. "- [ ] " .. line:gsub("^%s*", "")
   end
 end
@@ -61,22 +63,22 @@ local function apply_to_lines(func, stay_insert)
 end
 
 -- 公開関数
-function M.add_list(stay_insert)        apply_to_lines(process_add_list, stay_insert) end
-function M.add_checkbox(stay_insert)    apply_to_lines(process_add_checkbox, stay_insert) end
-function M.toggle_checkbox(stay_insert) apply_to_lines(process_toggle_checkbox, stay_insert) end
+function M.toggle_list(stay_insert) apply_to_lines(process_toggle_list, stay_insert) end
+function M.toggle_checkbox_presence(stay_insert) apply_to_lines(process_toggle_checkbox_presence, stay_insert) end
+function M.toggle_checkbox_state(stay_insert) apply_to_lines(process_toggle_checkbox_state, stay_insert) end
 
 -- キーマッピング（Markdown 専用）
 vim.api.nvim_create_autocmd("FileType", {
   pattern = "markdown",
   callback = function()
     -- ノーマル / ビジュアル
-    vim.keymap.set({"n", "v"}, "<Leader>l", function() M.add_list(false) end, { buffer = true, desc = "Add list" })
-    vim.keymap.set({"n", "v"}, "<Leader>c", function() M.add_checkbox(false) end, { buffer = true, desc = "Add checkbox" })
-    vim.keymap.set({"n", "v"}, "<Leader>x", function() M.toggle_checkbox(false) end, { buffer = true, desc = "Toggle checkbox" })
+    vim.keymap.set({"n", "v"}, "<Leader>l", function() M.toggle_list(false) end, { buffer = true, desc = "Toggle list item" })
+    vim.keymap.set({"n", "v"}, "<Leader>c", function() M.toggle_checkbox_presence(false) end, { buffer = true, desc = "Toggle checkbox" })
+    vim.keymap.set({"n", "v"}, "<Leader>x", function() M.toggle_checkbox_state(false) end, { buffer = true, desc = "Toggle checkbox state" })
     -- インサートモード
-    vim.keymap.set("i", "<C-l>", function() M.add_list(true) end, { buffer = true, desc = "Add list (insert)" })
-    vim.keymap.set("i", "<C-c>", function() M.add_checkbox(true) end, { buffer = true, desc = "Add checkbox (insert)" })
-    vim.keymap.set("i", "<C-x>", function() M.toggle_checkbox(true) end, { buffer = true, desc = "Toggle checkbox (insert)" })
+    vim.keymap.set("i", "<C-l>", function() M.toggle_list(true) end, { buffer = true, desc = "Toggle list item (insert)" })
+    vim.keymap.set("i", "<C-c>", function() M.toggle_checkbox_presence(true) end, { buffer = true, desc = "Toggle checkbox (insert)" })
+    vim.keymap.set("i", "<C-x>", function() M.toggle_checkbox_state(true) end, { buffer = true, desc = "Toggle checkbox state (insert)" })
   end,
 })
 
