@@ -28,9 +28,9 @@ end
 local function process_toggle_checkbox(line)
   local indent = get_indent(line)
   if line:match("^%s*%- %[ %]") then
-    return line:gsub("^(%s*%-) %[ %]", "%1 [x]")
+    return (line:gsub("^(%s*%-) %[ %]", "%1 [x]"))
   elseif line:match("^%s*%- %[x%]") then
-    return line:gsub("^(%s*%-) %[x%]", "%1 [ ]")
+    return (line:gsub("^(%s*%-) %[x%]", "%1 [ ]"))
   else
     return indent .. "- [ ] " .. line:gsub("^%s*", "")
   end
