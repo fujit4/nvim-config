@@ -42,6 +42,11 @@ return {
 				capabilities = capabilities,
 			})
 
+			-- TypeScript/JavaScript 言語サーバー（ts_ls）設定
+			lspconfig.ts_ls.setup({
+				capabilities = capabilities,
+			})
+
 
 			-- エラーポップアップ表示キー
 			vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { noremap = true, silent = true })
