@@ -26,12 +26,12 @@ local function process_toggle_checkbox_presence(line)
   end
 end
 
--- 1行処理: チェックボックスの状態をトグル
-local function process_toggle_checkbox_state(line)
+-- 1行処理: チェックボックスの状態を完了状態に
+local function process_check_checkbox(line)
   if line:match("^%s*%- %[ %]") then
     return (line:gsub("^(%s*%-) %[ %]", "%1 [x]"))
   elseif line:match("^%s*%- %[x%]") then
-    return (line:gsub("^(%s*%-) %[x%]", "%1 [ ]"))
+    return line
   else
     local indent = get_indent(line)
     return indent .. "- [ ] " .. line:gsub("^%s*", "")
@@ -65,18 +65,18 @@ end
 -- 公開関数
 function M.toggle_list(stay_insert) apply_to_lines(process_toggle_list, stay_insert) end
 function M.toggle_checkbox_presence(stay_insert) apply_to_lines(process_toggle_checkbox_presence, stay_insert) end
-function M.toggle_checkbox_state(stay_insert) apply_to_lines(process_toggle_checkbox_state, stay_insert) end
+function M.toggle_checkbox_state(stay_insert) apply_to_lines(process_check_checkbox, stay_insert) end
 
 -- キーマッピング（Markdown 専用）
 vim.api.nvim_create_autocmd("FileType", {
   pattern = "markdown",
   callback = function()
     -- ノーマル / ビジュアル
-    vim.keymap.set({"n", "v"}, "<Leader>l", function() M.toggle_list(false) end, { buffer = true, desc = "Toggle list item" })
-    vim.keymap.set({"n", "v"}, "<Leader>c", function() M.toggle_checkbox_presence(false) end, { buffer = true, desc = "Toggle checkbox" })
-    vim.keymap.set({"n", "v"}, "<Leader>x", function() M.toggle_checkbox_state(false) end, { buffer = true, desc = "Toggle checkbox state" })
+    vim.keymap.set({"n", "v"}, "<C-S-b>", function() M.toggle_list(false) end, { buffer = true, desc = "Toggle list item" })
+    vim.keymap.set({"n", "v"}, "<C-S-c>", function() M.toggle_checkbox_presence(false) end, { buffer = true, desc = "Toggle checkbox" })
+    vim.keymap.set({"n", "v"}, "<C-S-x>", function() M.toggle_checkbox_state(false) end, { buffer = true, desc = "Toggle checkbox state" })
     -- インサートモード
-    vim.keymap.set("i", "<C-l>", function() M.toggle_list(true) end, { buffer = true, desc = "Toggle list item (insert)" })
+    vim.keymap.set("i", "<C-b>", function() M.toggle_list(true) end, { buffer = true, desc = "Toggle list item (insert)" })
     vim.keymap.set("i", "<C-c>", function() M.toggle_checkbox_presence(true) end, { buffer = true, desc = "Toggle checkbox (insert)" })
     vim.keymap.set("i", "<C-x>", function() M.toggle_checkbox_state(true) end, { buffer = true, desc = "Toggle checkbox state (insert)" })
   end,
