@@ -76,9 +76,9 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.keymap.set({"n", "v"}, "<C-S-c>", function() M.toggle_checkbox_presence(false) end, { buffer = true, desc = "Toggle checkbox" })
     vim.keymap.set({"n", "v"}, "<C-S-x>", function() M.toggle_checkbox_state(false) end, { buffer = true, desc = "Toggle checkbox state" })
     -- インサートモード
-    vim.keymap.set("i", "<C-b>", function() M.toggle_list(true) end, { buffer = true, desc = "Toggle list item (insert)" })
-    vim.keymap.set("i", "<C-c>", function() M.toggle_checkbox_presence(true) end, { buffer = true, desc = "Toggle checkbox (insert)" })
-    vim.keymap.set("i", "<C-x>", function() M.toggle_checkbox_state(true) end, { buffer = true, desc = "Toggle checkbox state (insert)" })
+    vim.keymap.set("i", "<C-S-b>", function() M.toggle_list(true) end, { buffer = true, desc = "Toggle list item (insert)" })
+    vim.keymap.set("i", "<C-S-c>", function() M.toggle_checkbox_presence(true) end, { buffer = true, desc = "Toggle checkbox (insert)" })
+    vim.keymap.set("i", "<C-S-x>", function() M.toggle_checkbox_state(true) end, { buffer = true, desc = "Toggle checkbox state (insert)" })
   end,
 })
 
