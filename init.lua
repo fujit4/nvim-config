@@ -17,6 +17,7 @@ vim.o.linebreak = true   -- 単語の途中で折り返さない
 vim.o.breakindent = true -- 折り返し行でインデントを維持
 vim.o.showbreak = "> "   -- 折り返し行の頭にマークを表示（お好みで）
 vim.o.guifont = 'PlemolJP HSNF:h12'
+vim.o.timeout = false -- モードのタイムアウトを無効にする
 
 -- 環境変数から `XDG_CONFIG_HOME` を取得して `runtimepath` に lazy.nvim を追加
 -- local config_home = vim.env.XDG_CONFIG_HOME or vim.fn.stdpath('config')
