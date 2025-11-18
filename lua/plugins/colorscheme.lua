@@ -30,6 +30,7 @@ return {
       })
 
       vim.cmd("colorscheme dawnfox")
+
     end,
   },
 }
