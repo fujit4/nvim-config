@@ -191,7 +191,7 @@ return {
 
 			-- Lua 言語サーバー設定
 			-- lspconfig.lua_ls.setup({
-			cfg.lua_ls({
+			cfg["lua_ls"] = {
 				capabilities = capabilities,
 				cmd = { "lua-language-server.exe" },
 				root_dir = function(fname)
@@ -215,21 +215,20 @@ return {
 						},
 					},
 				},
-			})
+			}
 
 			-- Go 言語サーバー（gopls）設定
 			-- lspconfig.gopls.setup({
-			cfg.gopls({
+			cfg["gopls"] = {
 				capabilities = capabilities,
-			})
+			}
 
 			-- TypeScript/JavaScript 言語サーバー（ts_ls）設定
 			-- lspconfig.ts_ls.setup({
-			cfg.ts_ls({
+			cfg["ts_ls"] = {
 				capabilities = capabilities,
-			})
+			}
 
-			vim.lsp.enable()
 
 
 			-- エラーポップアップ表示キー
