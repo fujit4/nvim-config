@@ -184,52 +184,22 @@ return {
 			"hrsh7th/cmp-nvim-lsp", -- LSP補完
 		},
 		config = function()
-			-- local lspconfig = require("lspconfig") ← deprecated
-			local cfg = vim.lsp.config
-			local util = require("lspconfig.util")
-			local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
-			-- Lua 言語サーバー設定
-			-- lspconfig.lua_ls.setup({
-			cfg["lua_ls"] = {
-				capabilities = capabilities,
-				cmd = { "lua-language-server.exe" },
-				root_dir = function(fname)
-					return util.root_pattern(".git", "init.lua", ".luarc.json", ".luarc.jsonc")(fname)
-					or vim.fn.stdpath("config")
-				end,
-				settings = {
-					Lua = {
-						diagnostics = {
-							globals = { "vim" }, -- vimグローバルを未定義扱いしない
-						},
-						workspace = {
-							library = {
-								[vim.fn.expand("$VIMRUNTIME/lua")] = true,
-								[vim.fn.stdpath("config") .. "/lua"] = true,
-							},
-							checkThirdParty = false,
-						},
-						completion = {
-							callSnippet = "Replace",
-						},
-					},
-				},
+			-- 共通設定
+			vim.lsp.config('*', {
+				capabilities = require("cmp_nvim_lsp").default_capabilities(),
+			})
+
+			-- 個別設定
+			-- `nvim/after/lsp/<lsp_name>.lua`
+
+			-- 自動起動設定
+			local lsp_names = {
+				"lua_ls",
+				"gopls",
+				"ts_ls",
 			}
-
-			-- Go 言語サーバー（gopls）設定
-			-- lspconfig.gopls.setup({
-			cfg["gopls"] = {
-				capabilities = capabilities,
-			}
-
-			-- TypeScript/JavaScript 言語サーバー（ts_ls）設定
-			-- lspconfig.ts_ls.setup({
-			cfg["ts_ls"] = {
-				capabilities = capabilities,
-			}
-
-
+			vim.lsp.enable(lsp_names)
 
 			-- エラーポップアップ表示キー
 			vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { noremap = true, silent = true })
