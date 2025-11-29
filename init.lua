@@ -60,6 +60,8 @@ vim.keymap.set("i", "<C-v>", function()
 	end, 0)
 end, { noremap = true, silent = true })
 
+vim.keymap.set("c", "<C-v>", "<C-r>+", { noremap = true })
+
 vim.api.nvim_set_keymap("v", "<C-c>", '"+y', { noremap = true, silent = true })
 
 --
