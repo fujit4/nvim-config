@@ -35,7 +35,6 @@ return {
 	{
 		"kamecha/bimove",
 		config = function()
-
 			-- キーマップ設定
 			vim.keymap.set("n", "M", "<Plug>(bimove-enter)<Plug>(bimove)", { silent = true })
 			vim.keymap.set("n", "<Plug>(bimove)k", "<Plug>(bimove-high)<Plug>(bimove)", { silent = true })
@@ -45,7 +44,6 @@ return {
 			vim.api.nvim_set_hl(0, "BimoveHigh", { link = "Search" })
 			vim.api.nvim_set_hl(0, "BimoveCursor", { link = "Visual" })
 			vim.api.nvim_set_hl(0, "BimoveLow", { link = "Visual" })
-
 		end,
 	},
 	{
@@ -53,10 +51,10 @@ return {
 		event = "InsertEnter", -- 挿入モードで読み込み
 		dependencies = {
 			"hrsh7th/cmp-nvim-lsp", -- LSP補完
-			"hrsh7th/cmp-buffer",   -- バッファ内補完
-			"hrsh7th/cmp-path",     -- パス補完
-			"hrsh7th/cmp-cmdline",  -- コマンドライン補完
-			"L3MON4D3/LuaSnip",     -- スニペットエンジン
+			"hrsh7th/cmp-buffer", -- バッファ内補完
+			"hrsh7th/cmp-path", -- パス補完
+			"hrsh7th/cmp-cmdline", -- コマンドライン補完
+			"L3MON4D3/LuaSnip", -- スニペットエンジン
 			"saadparwaiz1/cmp_luasnip", -- LuaSnip用補完
 		},
 		config = function()
@@ -79,30 +77,46 @@ return {
 					-- Tabで補完候補を「選択していれば」確定にしたい場合は下記
 					-- --------------------------------------------------------
 					-- ['<Tab>'] = cmp.mapping(function(fallback)
-						-- 	if cmp.visible() and cmp.get_selected_entry() then
-						-- 		cmp.confirm({ select = false })  -- ←ここが重要
-						-- 	else
-						-- 		fallback()
-						-- 	end
-						-- end, { 'i', 's' }),
-						-- 以上 ---------------------------------------------------
-						['<CR>'] = cmp.mapping(function(fallback)
-							if cmp.visible() and cmp.get_selected_entry() then
-								cmp.confirm({ select = false })  -- ←ここが重要
-							else
-								fallback()
-							end
-						end, { 'i', 's' }),
-					}),
-					sources = cmp.config.sources({
-						{ name = "nvim_lsp" },
-						{ name = "luasnip" },
-						{ name = "buffer" },
-						{ name = "path" },
-					}),
-				})
+					-- 	if cmp.visible() and cmp.get_selected_entry() then
+					-- 		cmp.confirm({ select = false })  -- ←ここが重要
+					-- 	else
+					-- 		fallback()
+					-- 	end
+					-- end, { 'i', 's' }),
+					-- 以上 ---------------------------------------------------
+					['<CR>'] = cmp.mapping(function(fallback)
+						if cmp.visible() and cmp.get_selected_entry() then
+							cmp.confirm({ select = false }) -- ←ここが重要
+						else
+							fallback()
+						end
+					end, { 'i', 's' }),
+				}),
+				sources = cmp.config.sources({
+					{ name = "nvim_lsp" },
+					{ name = "luasnip" },
+					{ name = "buffer" },
+					{ name = "path" },
+				}),
+			})
 
-			end,
+			-- `:` cmdline setup.
+			cmp.setup.cmdline(':', {
+				mapping = cmp.mapping.preset.cmdline(),
+				sources = cmp.config.sources({
+					{ name = "cmdline" },
+					{ name = 'path' }
+				}, {
+					{
+						name = 'cmdline',
+						option = {
+							ignore_cmds = { 'Man', '!' }
+						}
+					}
+				})
+			})
+
+		end,
 	},
 	{
 		"numToStr/Comment.nvim",
@@ -119,14 +133,14 @@ return {
 
 			-- Prettier を使うファイルタイプ
 			formatters_by_ft = {
-				javascript        = { "prettier" },
-				typescript        = { "prettier" },
-				javascriptreact   = { "prettier" },
-				typescriptreact   = { "prettier" },
-				css               = { "prettier" },
-				html              = { "prettier" },
-				json              = { "prettier" },
-				yaml              = { "prettier" },
+				javascript      = { "prettier" },
+				typescript      = { "prettier" },
+				javascriptreact = { "prettier" },
+				typescriptreact = { "prettier" },
+				css             = { "prettier" },
+				html            = { "prettier" },
+				json            = { "prettier" },
+				yaml            = { "prettier" },
 			},
 		},
 		config = function(_, opts)
@@ -147,8 +161,6 @@ return {
 		"lewis6991/gitsigns.nvim",
 		event = { "BufReadPre", "BufNewFile" },
 		config = function()
-
-
 			require("gitsigns").setup({
 				signs = {
 					add          = { text = "+" },
@@ -184,7 +196,6 @@ return {
 			"hrsh7th/cmp-nvim-lsp", -- LSP補完
 		},
 		config = function()
-
 			-- 共通設定
 			vim.lsp.config('*', {
 				capabilities = require("cmp_nvim_lsp").default_capabilities(),
@@ -207,7 +218,6 @@ return {
 				vim.diagnostic.setqflist()
 			end, { noremap = true, silent = true })
 			vim.keymap.set('n', '<leader>c', vim.lsp.buf.code_action, { noremap = true, silent = true })
-
 		end,
 	},
 	{
@@ -217,10 +227,10 @@ return {
 			require("lualine").setup({
 				options = {
 					theme = "gruvbox-material",
-					icons_enabled = false,  -- リガチャ・アイコン不要のため
+					icons_enabled = false, -- リガチャ・アイコン不要のため
 					component_separators = { left = "│", right = "│" },
 					section_separators = { left = "", right = "" },
-					globalstatus = true,  -- ウィンドウごとのステータスラインではなく全体に
+					globalstatus = true, -- ウィンドウごとのステータスラインではなく全体に
 				},
 				sections = {
 					lualine_a = { "mode" },
@@ -294,8 +304,8 @@ return {
 					mappings = {
 						n = {
 							["s"] = open_with_system_editor,
-							["<Esc>"] = false,           -- Esc 無効化
-							["q"] = actions.close,       -- q で閉じる
+							["<Esc>"] = false, -- Esc 無効化
+							["q"] = actions.close, -- q で閉じる
 						},
 					},
 				},
