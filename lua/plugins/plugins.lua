@@ -222,7 +222,6 @@ return {
 	},
 	{
 		"nvim-lualine/lualine.nvim",
-		dependencies = { "nvim-tree/nvim-web-devicons" }, -- アイコン不要なら削除可
 		config = function()
 			require("lualine").setup({
 				options = {
@@ -265,12 +264,11 @@ return {
 		-- lazy = false,
 		dependencies = {
 			"stevearc/oil.nvim",
-			{ "echasnovski/mini.icons", opts = {} },
-			"nvim-tree/nvim-web-devicons",
 		},
 		config = function()
 			require("Otree").setup()
-		end
+		end,
+		vim.keymap.set('n', '<C-e>', ":OtreeFocus<CR>", { noremap = true, silent = true })
 	},
 	{
 		"nvim-telescope/telescope.nvim",
