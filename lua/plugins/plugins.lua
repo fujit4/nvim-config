@@ -115,7 +115,6 @@ return {
 					}
 				})
 			})
-
 		end,
 	},
 	{
@@ -266,9 +265,21 @@ return {
 			"stevearc/oil.nvim",
 		},
 		config = function()
-			require("Otree").setup()
+			require("Otree").setup(
+				{
+					icons = {
+						title = "",
+						default_file = " ",
+						default_directory = "D",
+						empty_dir = "d",
+						trash = "",
+						keymap = "",
+						oil = " ",
+					}
+				}
+			)
 		end,
-		vim.keymap.set('n', '<C-e>', ":OtreeFocus<CR>", { noremap = true, silent = true })
+		vim.keymap.set('n', '<C-e>', ":Otree<CR>", { noremap = true, silent = true })
 	},
 	{
 		"nvim-telescope/telescope.nvim",
