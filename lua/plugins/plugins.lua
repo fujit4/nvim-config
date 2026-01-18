@@ -17,19 +17,22 @@ return {
 		"rbtnn/vim-ambiwidth",
 		init = function()
 			local add_list = {}
+			-- ▲(Triangles) to ◄(Geometric Shapes)
 			for code = 0x25b2, 0x25c4 do
 				local char = vim.fn.nr2char(code)
 				if vim.fn.char2nr(char) == code then
 					table.insert(add_list, { code, code, 2 })
 				end
 			end
-			for code = 0x25ce, 0x25ce do
-				local char = vim.fn.nr2char(code)
-				if vim.fn.char2nr(char) == code then
-					table.insert(add_list, { code, code, 2 })
-				end
-			end
+			-- ◎(BULLSEYE) 
+			table.insert(add_list, { 0x25ce, 0x25ce, 2 })
+			-- ×(かける）
+			table.insert(add_list, { 0x00d7, 0x00d7, 2 })
+			-- ÷(わる)
+			table.insert(add_list, { 0x00f7, 0x00f7, 2 })
+
 			vim.g.ambiwidth_add_list = add_list
+
 		end,
 	},
 	{
