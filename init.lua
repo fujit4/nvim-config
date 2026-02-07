@@ -1,4 +1,3 @@
--- 事前設定
 vim.g.mapleader = ' '
 vim.o.number = true
 vim.o.syntax = 'on'
@@ -10,36 +9,134 @@ vim.o.bomb = false
 vim.o.tabstop = 4    -- 画面上のTab幅（見た目）
 vim.o.shiftwidth = 4 -- 自動インデント時の幅
 vim.o.swapfile = false
-vim.o.ambiwidth = 'single'
+vim.o.ambiwidth = 'double'
 vim.opt.whichwrap:append("<,>,h,l,[,]")
 vim.o.wrap = true        -- 折り返しを有効化
 vim.o.linebreak = true   -- 単語の途中で折り返さない
 vim.o.breakindent = true -- 折り返し行でインデントを維持
-vim.o.showbreak = "> "   -- 折り返し行の頭にマークを表示（お好みで）
+-- vim.o.showbreak = "> "   -- 折り返し行の頭にマークを表示
 vim.o.guifont = 'PlemolJP HSNF:h12'
 vim.o.timeout = false -- モードのタイムアウトを無効にする
 
--- 環境変数から `XDG_CONFIG_HOME` を取得して `runtimepath` に lazy.nvim を追加
--- local config_home = vim.env.XDG_CONFIG_HOME or vim.fn.stdpath('config')
-local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
-if not (vim.uv or vim.loop).fs_stat(lazypath) then
-	local lazyrepo = "https://github.com/folke/lazy.nvim.git"
-	local out = vim.fn.system({ "git", "clone", "--filter=blob:none", "--branch=stable", lazyrepo, lazypath })
-	if vim.v.shell_error ~= 0 then
-		vim.api.nvim_echo({
-			{ "Failed to clone lazy.nvim:\n", "ErrorMsg" },
-			{ out,                            "WarningMsg" },
-			{ "\nPress any key to exit..." },
-		}, true, {})
-		vim.fn.getchar()
-		os.exit(1)
-	end
+-- カラースキーマの設定
+vim.cmd[[colorscheme morning]]
+
+-- LSP周りの設定 ------------------------------------------------------
+
+-- キーマップ
+local lsp_maps = {
+  -- 移動
+  { "n", "gd", "definition", vim.lsp.buf.definition },
+  { "n", "gD", "declaration", vim.lsp.buf.declaration },
+  { "n", "gi", "implementation", vim.lsp.buf.implementation },
+  { "n", "gr", "references", vim.lsp.buf.references },
+
+  -- 情報
+  { "n", "<C-k>", "hover", vim.lsp.buf.hover },
+  { "n", "<leader>sh", "signature help", vim.lsp.buf.signature_help },
+
+  -- 編集
+  { "n", "<leader>rn", "rename", vim.lsp.buf.rename },
+  { "n", "<leader>ca", "code action", vim.lsp.buf.code_action },
+
+  -- 診断
+  { "n", "[d", "prev diagnostic", vim.diagnostic.goto_prev },
+  { "n", "]d", "next diagnostic", vim.diagnostic.goto_next },
+  { "n", "<leader>e", "diagnostic detail", vim.diagnostic.open_float },
+}
+
+-- キーマップの適用
+local function apply_lsp_keymaps(bufnr)
+  for _, m in ipairs(lsp_maps) do
+    local mode, lhs, _, rhs = unpack(m)
+    vim.keymap.set(mode, lhs, rhs, {
+      buffer = bufnr,
+      silent = true,
+    })
+  end
 end
-vim.opt.rtp:prepend(lazypath)
 
--- -- lazy.nvim 読み込み
-require('lazy').setup('plugins')
+-- キーマップのヘルプ
+local function show_lsp_help()
+  local lines = { "LSP keymaps", "-----------" }
 
+  for _, m in ipairs(lsp_maps) do
+    local mode, lhs, desc = m[1], m[2], m[3]
+    table.insert(lines, string.format("%-10s %s", lhs, desc))
+  end
+
+  vim.notify(table.concat(lines, "\n"), vim.log.levels.INFO)
+end
+
+vim.keymap.set("n", "<leader>lh", show_lsp_help)
+
+
+-- LSPクライアント本体
+
+-- Go (gopls)
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "go",
+  callback = function()
+    vim.lsp.start({
+      name = "gopls",
+      cmd = { "gopls" },
+      root_dir = vim.fn.getcwd(),
+    })
+
+	apply_lsp_keymaps(vim.api.nvim_get_current_buf())
+  end,
+})
+
+-- Lua (lua-language-server)
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "lua",
+  callback = function()
+    vim.lsp.start({
+      name = "lua_ls",
+      cmd = { "lua-language-server" },
+      settings = {
+        Lua = {
+          diagnostics = {
+            globals = { "vim" },
+          },
+        },
+      },
+    })
+
+	apply_lsp_keymaps(vim.api.nvim_get_current_buf())
+  end,
+})
+
+
+-- 入力補完
+vim.opt.completeopt = { "menu", "menuone", "noselect" }
+
+-- Tab操作で選択肢を移動
+vim.keymap.set("i", "<Tab>", function()
+  if vim.fn.pumvisible() == 1 then
+    return "<C-n>"
+  end
+  return "<Tab>"
+end, { expr = true })
+
+vim.keymap.set("i", "<S-Tab>", function()
+  if vim.fn.pumvisible() == 1 then
+    return "<C-p>"
+  end
+  return "<S-Tab>"
+end, { expr = true })
+
+-- Enterで確定
+vim.keymap.set("i", "<CR>", function()
+  if vim.fn.pumvisible() == 1 then
+    return "<C-y>"
+  end
+  return "<CR>"
+end, { expr = true })
+
+
+
+-- IME周りの設定 ------------------------------------------------------
 -- 挿入モードに入ったとき IME をオフにする
 vim.api.nvim_create_autocmd("InsertLeave", {
 	callback = function()
@@ -48,6 +145,7 @@ vim.api.nvim_create_autocmd("InsertLeave", {
 	end,
 })
 
+-- Windows風に使うための設定（コピペ、保存） ------------------------------------------------------
 -- ctrl v でpasteモードにして貼り付けてnopasteに戻す
 vim.keymap.set("i", "<C-v>", function()
 	-- pasteモードを一時的に有効にする
@@ -79,7 +177,7 @@ vim.keymap.set("i", "<C-s>", function()
 	vim.api.nvim_win_set_cursor(0, cursor_pos)
 end, { noremap = true, silent = true, desc = "Save without leaving insert mode" })
 
--- フォントサイズを増減するユーティリティ
+-- フォントサイズを増減するユーティリティ ---------------------------------
 local function font_size_change(delta)
 	local guifont = vim.o.guifont
 	if guifont == nil or guifont == "" then
@@ -119,4 +217,7 @@ vim.keymap.set({ "n", "i", "v", "c" }, "<C-->", function()
 	font_size_change(-1)
 end, { desc = "Decrease GUI font size by 1pt", silent = true })
 
+
+-- マークダウン操作 ---------------------------------------------------
 require("markdown_utils")
+
