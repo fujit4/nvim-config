@@ -1,110 +1,120 @@
+local unpack = unpack or table.unpack -- Lua5.1/5.2+対応
+
 vim.g.mapleader = ' '
+
 vim.o.number = true
 vim.o.syntax = 'on'
 vim.o.signcolumn = 'yes'
+
 vim.o.encoding = 'utf-8'
 vim.o.fileencoding = 'utf-8'
 vim.o.fileencodings = 'utf-8,sjis,euc-jp'
 vim.o.bomb = false
+
 vim.o.tabstop = 4    -- 画面上のTab幅（見た目）
 vim.o.shiftwidth = 4 -- 自動インデント時の幅
+
 vim.o.swapfile = false
+
 vim.o.ambiwidth = 'double'
 vim.opt.whichwrap:append("<,>,h,l,[,]")
+
 vim.o.wrap = true        -- 折り返しを有効化
 vim.o.linebreak = true   -- 単語の途中で折り返さない
 vim.o.breakindent = true -- 折り返し行でインデントを維持
--- vim.o.showbreak = "> "   -- 折り返し行の頭にマークを表示
-vim.o.guifont = 'PlemolJP HSNF:h12'
-vim.o.timeout = false -- モードのタイムアウトを無効にする
 
--- カラースキーマの設定
-vim.cmd[[colorscheme morning]]
+vim.o.timeout = false    -- モードのタイムアウトを無効にする
+
+vim.o.guifont = 'PlemolJP HSNF:h12'
+
+vim.cmd [[colorscheme morning]]
 
 -- LSP周りの設定 ------------------------------------------------------
+-- ============================================================
+-- LSP Actions 定義
+-- 順番: func, name, mode?, lhs?
+-- ============================================================
 
--- キーマップ
-local lsp_maps = {
-  -- 移動
-  { "n", "gd", "definition", vim.lsp.buf.definition },
-  { "n", "gD", "declaration", vim.lsp.buf.declaration },
-  { "n", "gi", "implementation", vim.lsp.buf.implementation },
-  { "n", "gr", "references", vim.lsp.buf.references },
+local lsp_actions = {
+	-- 移動
+	{ vim.lsp.buf.definition,     "Definition",      "n", "gd" },
+	{ vim.lsp.buf.declaration,    "Declaration",     "n", "gD" },
+	{ vim.lsp.buf.implementation, "Implementation",  "n", "gi" },
+	{ vim.lsp.buf.references,     "References",      "n", "gr" },
 
-  -- 情報
-  { "n", "<C-k>", "hover", vim.lsp.buf.hover },
-  { "n", "<leader>sh", "signature help", vim.lsp.buf.signature_help },
+	-- 情報
+	{ vim.lsp.buf.hover,          "Hover",           "n", "<C-k>" },
+	{ vim.lsp.buf.signature_help, "SignatureHelp",   "n", "<leader>sh" },
 
-  -- 編集
-  { "n", "<leader>rn", "rename", vim.lsp.buf.rename },
-  { "n", "<leader>ca", "code action", vim.lsp.buf.code_action },
+	-- 編集
+	{ vim.lsp.buf.rename,         "Rename",          "n", "<leader>rn" },
+	{ vim.lsp.buf.code_action,    "CodeAction",      "n", "<leader>ca" },
 
-  -- 診断
-  { "n", "[d", "prev diagnostic", vim.diagnostic.goto_prev },
-  { "n", "]d", "next diagnostic", vim.diagnostic.goto_next },
-  { "n", "<leader>e", "diagnostic detail", vim.diagnostic.open_float },
+	-- 診断
+	{ vim.diagnostic.goto_prev,   "PrevDiagnostic",  "n", "[d" },
+	{ vim.diagnostic.goto_next,   "NextDiagnostic",  "n", "]d" },
+	{ vim.diagnostic.open_float,  "DiagnosticFloat", "n", "<leader>e" },
+
+	-- フォーマット
+	{ vim.lsp.buf.format,         "Format" },
 }
 
--- キーマップの適用
-local function apply_lsp_keymaps(bufnr)
-  for _, m in ipairs(lsp_maps) do
-    local mode, lhs, _, rhs = unpack(m)
-    vim.keymap.set(mode, lhs, rhs, {
-      buffer = bufnr,
-      silent = true,
-    })
-  end
+-- ============================================================
+-- 登録処理（ここだけ共通）
+-- ============================================================
+
+local function register_lsp_features(bufnr)
+	for _, action in ipairs(lsp_actions) do
+		local func, name, mode, lhs = unpack(action)
+
+		-- コマンドは常に作る
+		vim.api.nvim_create_user_command("Lsp" .. name, function() func() end, {})
+
+		-- mode と lhs があればキーマップ登録
+		if mode and lhs then
+			vim.keymap.set(mode, lhs, func, {
+				buffer = bufnr,
+				silent = true,
+				desc = "Lsp" .. name,
+			})
+		end
+	end
 end
 
--- キーマップのヘルプ
-local function show_lsp_help()
-  local lines = { "LSP keymaps", "-----------" }
+-- ============================================================
+-- LSP 起動
+-- ============================================================
 
-  for _, m in ipairs(lsp_maps) do
-    local mode, lhs, desc = m[1], m[2], m[3]
-    table.insert(lines, string.format("%-10s %s", lhs, desc))
-  end
-
-  vim.notify(table.concat(lines, "\n"), vim.log.levels.INFO)
-end
-
-vim.keymap.set("n", "<leader>lh", show_lsp_help)
-
-
--- LSPクライアント本体
-
--- Go (gopls)
+-- Go
 vim.api.nvim_create_autocmd("FileType", {
-  pattern = "go",
-  callback = function()
-    vim.lsp.start({
-      name = "gopls",
-      cmd = { "gopls" },
-      root_dir = vim.fn.getcwd(),
-    })
-
-	apply_lsp_keymaps(vim.api.nvim_get_current_buf())
-  end,
+	pattern = "go",
+	callback = function()
+		vim.lsp.start({
+			name = "gopls",
+			cmd = { "gopls" },
+			root_dir = vim.fn.getcwd(),
+		})
+		register_lsp_features(vim.api.nvim_get_current_buf())
+	end,
 })
 
--- Lua (lua-language-server)
+-- Lua
 vim.api.nvim_create_autocmd("FileType", {
-  pattern = "lua",
-  callback = function()
-    vim.lsp.start({
-      name = "lua_ls",
-      cmd = { "lua-language-server" },
-      settings = {
-        Lua = {
-          diagnostics = {
-            globals = { "vim" },
-          },
-        },
-      },
-    })
-
-	apply_lsp_keymaps(vim.api.nvim_get_current_buf())
-  end,
+	pattern = "lua",
+	callback = function()
+		vim.lsp.start({
+			name = "lua_ls",
+			cmd = { "lua-language-server" },
+			settings = {
+				Lua = {
+					diagnostics = {
+						globals = { "vim" },
+					},
+				},
+			},
+		})
+		register_lsp_features(vim.api.nvim_get_current_buf())
+	end,
 })
 
 
@@ -113,25 +123,25 @@ vim.opt.completeopt = { "menu", "menuone", "noselect" }
 
 -- Tab操作で選択肢を移動
 vim.keymap.set("i", "<Tab>", function()
-  if vim.fn.pumvisible() == 1 then
-    return "<C-n>"
-  end
-  return "<Tab>"
+	if vim.fn.pumvisible() == 1 then
+		return "<C-n>"
+	end
+	return "<Tab>"
 end, { expr = true })
 
 vim.keymap.set("i", "<S-Tab>", function()
-  if vim.fn.pumvisible() == 1 then
-    return "<C-p>"
-  end
-  return "<S-Tab>"
+	if vim.fn.pumvisible() == 1 then
+		return "<C-p>"
+	end
+	return "<S-Tab>"
 end, { expr = true })
 
 -- Enterで確定
 vim.keymap.set("i", "<CR>", function()
-  if vim.fn.pumvisible() == 1 then
-    return "<C-y>"
-  end
-  return "<CR>"
+	if vim.fn.pumvisible() == 1 then
+		return "<C-y>"
+	end
+	return "<CR>"
 end, { expr = true })
 
 
@@ -220,4 +230,3 @@ end, { desc = "Decrease GUI font size by 1pt", silent = true })
 
 -- マークダウン操作 ---------------------------------------------------
 require("markdown_utils")
-
