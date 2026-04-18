@@ -1,0 +1,13 @@
+{
+  "plugins": {
+    "oil.nvim": {
+      "rev": "975a77cce3c8cb742bc1b3629f4328f5ca977dad",
+      "src": "https://github.com/stevearc/oil.nvim",
+      "version": "'v2.15.0'"
+    },
+    "vim-ambiwidth": {
+      "rev": "4fd05792acac85d29bb0dc08f720a49093abefad",
+      "src": "https://github.com/rbtnn/vim-ambiwidth"
+    }
+  }
+}

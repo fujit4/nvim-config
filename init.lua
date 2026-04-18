@@ -1,4 +1,42 @@
+
+vim.pack.add({
+	{
+		src = 'https://github.com/stevearc/oil.nvim',
+		version = 'v2.15.0',
+	},
+	{
+		src = 'https://github.com/rbtnn/vim-ambiwidth',
+	}
+})
+
+require("oil").setup()
+
+
+ambiwidth_add_list = function()
+	local add_list = {}
+	-- ▲(Triangles) to ◄(Geometric Shapes)
+	for code = 0x25b2, 0x25c4 do
+		local char = vim.fn.nr2char(code)
+		if vim.fn.char2nr(char) == code then
+			table.insert(add_list, { code, code, 2 })
+		end
+	end
+	-- ◎(BULLSEYE) 
+	table.insert(add_list, { 0x25ce, 0x25ce, 2 })
+	-- ×(かける）
+	table.insert(add_list, { 0x00d7, 0x00d7, 2 })
+	-- ÷(わる)
+	table.insert(add_list, { 0x00f7, 0x00f7, 2 })
+
+	vim.g.ambiwidth_add_list = add_list
+
+end
+
+ambiwidth_add_list()
+
+
 local unpack = unpack or table.unpack -- Lua5.1/5.2+対応
+
 
 vim.g.mapleader = ' '
 
@@ -16,7 +54,7 @@ vim.o.shiftwidth = 4 -- 自動インデント時の幅
 
 vim.o.swapfile = false
 
-vim.o.ambiwidth = 'double'
+vim.o.ambiwidth = 'single'
 vim.opt.whichwrap:append("<,>,h,l,[,]")
 
 vim.o.wrap = true        -- 折り返しを有効化
