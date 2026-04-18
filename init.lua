@@ -6,6 +6,7 @@ vim.pack.add({
 	},
 	{
 		src = 'https://github.com/rbtnn/vim-ambiwidth',
+		rev = '4fd0579',
 	}
 })
 
