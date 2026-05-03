@@ -1,43 +1,4 @@
-
-vim.pack.add({
-	{
-		src = 'https://github.com/stevearc/oil.nvim',
-		version = 'v2.15.0',
-	},
-	{
-		src = 'https://github.com/rbtnn/vim-ambiwidth',
-		version = '4fd0579',
-	}
-})
-
-require("oil").setup()
-
-
-ambiwidth_add_list = function()
-	local add_list = {}
-	-- ▲(Triangles) to ◄(Geometric Shapes)
-	for code = 0x25b2, 0x25c4 do
-		local char = vim.fn.nr2char(code)
-		if vim.fn.char2nr(char) == code then
-			table.insert(add_list, { code, code, 2 })
-		end
-	end
-	-- ◎(BULLSEYE) 
-	table.insert(add_list, { 0x25ce, 0x25ce, 2 })
-	-- ×(かける）
-	table.insert(add_list, { 0x00d7, 0x00d7, 2 })
-	-- ÷(わる)
-	table.insert(add_list, { 0x00f7, 0x00f7, 2 })
-
-	vim.g.ambiwidth_add_list = add_list
-
-end
-
-ambiwidth_add_list()
-
-
 local unpack = unpack or table.unpack -- Lua5.1/5.2+対応
-
 
 vim.g.mapleader = ' '
 
@@ -66,96 +27,22 @@ vim.o.timeout = false    -- モードのタイムアウトを無効にする
 
 vim.o.guifont = 'PlemolJP HSNF:h12'
 
-vim.cmd [[colorscheme morning]]
+vim.cmd [[colorscheme default]]
+
+-- terminal -----------------------------------------------------------
+-- 抜ける専用
+vim.keymap.set('t', '<Esc><Esc><Esc>', [[<C-\><C-n>]])
+
+-- 移動で暗黙的に抜ける
+vim.keymap.set('t', '<C-h>', [[<C-\><C-n><C-w>h]])
+vim.keymap.set('t', '<C-j>', [[<C-\><C-n><C-w>j]])
+vim.keymap.set('t', '<C-k>', [[<C-\><C-n><C-w>k]])
+vim.keymap.set('t', '<C-l>', [[<C-\><C-n><C-w>l]])
 
 -- LSP周りの設定 ------------------------------------------------------
--- ============================================================
--- LSP Actions 定義
--- 順番: func, name, mode?, lhs?
--- ============================================================
 
-local lsp_actions = {
-	-- 移動
-	{ vim.lsp.buf.definition,     "Definition",      "n", "gd" },
-	{ vim.lsp.buf.declaration,    "Declaration",     "n", "gD" },
-	{ vim.lsp.buf.implementation, "Implementation",  "n", "gi" },
-	{ vim.lsp.buf.references,     "References",      "n", "gr" },
-
-	-- 情報
-	{ vim.lsp.buf.hover,          "Hover",           "n", "<C-k>" },
-	{ vim.lsp.buf.signature_help, "SignatureHelp",   "n", "<leader>sh" },
-
-	-- 編集
-	{ vim.lsp.buf.rename,         "Rename",          "n", "<leader>rn" },
-	{ vim.lsp.buf.code_action,    "CodeAction",      "n", "<leader>ca" },
-
-	-- 診断
-	{ vim.diagnostic.goto_prev,   "PrevDiagnostic",  "n", "[d" },
-	{ vim.diagnostic.goto_next,   "NextDiagnostic",  "n", "]d" },
-	{ vim.diagnostic.open_float,  "DiagnosticFloat", "n", "<leader>e" },
-
-	-- フォーマット
-	{ vim.lsp.buf.format,         "Format" },
-}
-
--- ============================================================
--- 登録処理（ここだけ共通）
--- ============================================================
-
-local function register_lsp_features(bufnr)
-	for _, action in ipairs(lsp_actions) do
-		local func, name, mode, lhs = unpack(action)
-
-		-- コマンドは常に作る
-		vim.api.nvim_create_user_command("Lsp" .. name, function() func() end, {})
-
-		-- mode と lhs があればキーマップ登録
-		if mode and lhs then
-			vim.keymap.set(mode, lhs, func, {
-				buffer = bufnr,
-				silent = true,
-				desc = "Lsp" .. name,
-			})
-		end
-	end
-end
-
--- ============================================================
--- LSP 起動
--- ============================================================
-
--- Go
-vim.api.nvim_create_autocmd("FileType", {
-	pattern = "go",
-	callback = function()
-		vim.lsp.start({
-			name = "gopls",
-			cmd = { "gopls" },
-			root_dir = vim.fn.getcwd(),
-		})
-		register_lsp_features(vim.api.nvim_get_current_buf())
-	end,
-})
-
--- Lua
-vim.api.nvim_create_autocmd("FileType", {
-	pattern = "lua",
-	callback = function()
-		vim.lsp.start({
-			name = "lua_ls",
-			cmd = { "lua-language-server" },
-			settings = {
-				Lua = {
-					diagnostics = {
-						globals = { "vim" },
-					},
-				},
-			},
-		})
-		register_lsp_features(vim.api.nvim_get_current_buf())
-	end,
-})
-
+vim.lsp.enable("lua_ls")
+vim.lsp.enable("gopls")
 
 -- 入力補完
 vim.opt.completeopt = { "menu", "menuone", "noselect" }
@@ -269,3 +156,43 @@ end, { desc = "Decrease GUI font size by 1pt", silent = true })
 
 -- マークダウン操作 ---------------------------------------------------
 require("markdown_utils")
+
+-- plugins ------------------------------------------------------------
+vim.pack.add({
+	{
+		src = 'https://github.com/stevearc/oil.nvim',
+		version = 'v2.15.0',
+	},
+	{
+		src = 'https://github.com/rbtnn/vim-ambiwidth',
+		version = '4fd0579',
+	},
+	{ src = 'https://github.com/neovim/nvim-lspconfig' },
+})
+
+require("oil").setup()
+
+
+ambiwidth_add_list = function()
+	local add_list = {}
+	-- ▲(Triangles) to ◄(Geometric Shapes)
+	for code = 0x25b2, 0x25c4 do
+		local char = vim.fn.nr2char(code)
+		if vim.fn.char2nr(char) == code then
+			table.insert(add_list, { code, code, 2 })
+		end
+	end
+	-- ◎(BULLSEYE) 
+	table.insert(add_list, { 0x25ce, 0x25ce, 2 })
+	-- ×(かける）
+	table.insert(add_list, { 0x00d7, 0x00d7, 2 })
+	-- ÷(わる)
+	table.insert(add_list, { 0x00f7, 0x00f7, 2 })
+
+	vim.g.ambiwidth_add_list = add_list
+
+end
+
+ambiwidth_add_list()
+
+

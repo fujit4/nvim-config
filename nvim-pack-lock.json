@@ -1,5 +1,9 @@
 {
   "plugins": {
+    "nvim-lspconfig": {
+      "rev": "31026a13eefb20681124706a79fc1df6bf11ab27",
+      "src": "https://github.com/neovim/nvim-lspconfig"
+    },
     "oil.nvim": {
       "rev": "975a77cce3c8cb742bc1b3629f4328f5ca977dad",
       "src": "https://github.com/stevearc/oil.nvim",
