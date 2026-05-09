@@ -39,38 +39,6 @@ vim.keymap.set('t', '<C-j>', [[<C-\><C-n><C-w>j]])
 vim.keymap.set('t', '<C-k>', [[<C-\><C-n><C-w>k]])
 vim.keymap.set('t', '<C-l>', [[<C-\><C-n><C-w>l]])
 
--- LSP周りの設定 ------------------------------------------------------
-
-vim.lsp.enable("lua_ls")
-vim.lsp.enable("gopls")
-
--- 入力補完
-vim.opt.completeopt = { "menu", "menuone", "noselect" }
-
--- Tab操作で選択肢を移動
-vim.keymap.set("i", "<Tab>", function()
-	if vim.fn.pumvisible() == 1 then
-		return "<C-n>"
-	end
-	return "<Tab>"
-end, { expr = true })
-
-vim.keymap.set("i", "<S-Tab>", function()
-	if vim.fn.pumvisible() == 1 then
-		return "<C-p>"
-	end
-	return "<S-Tab>"
-end, { expr = true })
-
--- Enterで確定
-vim.keymap.set("i", "<CR>", function()
-	if vim.fn.pumvisible() == 1 then
-		return "<C-y>"
-	end
-	return "<CR>"
-end, { expr = true })
-
-
 
 -- IME周りの設定 ------------------------------------------------------
 -- 挿入モードに入ったとき IME をオフにする
@@ -195,4 +163,36 @@ end
 
 ambiwidth_add_list()
 
+
+-- LSP周りの設定 ------------------------------------------------------
+
+vim.lsp.enable("lua_ls")
+vim.lsp.enable("gopls")
+
+-- 入力補完
+vim.opt.completeopt = { "menu", "menuone", "noselect","popup" }
+vim.o.pumborder = "single"
+
+-- Tab操作で選択肢を移動
+vim.keymap.set("i", "<Tab>", function()
+	if vim.fn.pumvisible() == 1 then
+		return "<C-n>"
+	end
+	return "<Tab>"
+end, { expr = true })
+
+vim.keymap.set("i", "<S-Tab>", function()
+	if vim.fn.pumvisible() == 1 then
+		return "<C-p>"
+	end
+	return "<S-Tab>"
+end, { expr = true })
+
+-- Enterで確定
+vim.keymap.set("i", "<CR>", function()
+	if vim.fn.pumvisible() == 1 then
+		return "<C-y>"
+	end
+	return "<CR>"
+end, { expr = true })
 

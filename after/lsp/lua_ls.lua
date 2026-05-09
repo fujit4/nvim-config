@@ -11,6 +11,9 @@ return {
 			diagnostics = {
 				globals = { "vim" }, -- vimグローバルを未定義扱いしない
 			},
+			runtime = {
+				version = "Lua 5.1",
+			},
 			workspace = {
 				library = {
 					[vim.fn.expand("$VIMRUNTIME/lua")] = true,
