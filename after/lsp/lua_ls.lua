@@ -12,7 +12,7 @@ return {
 				globals = { "vim" }, -- vimグローバルを未定義扱いしない
 			},
 			runtime = {
-				version = "Lua 5.1",
+				version = "LuaJIT",
 			},
 			workspace = {
 				library = {

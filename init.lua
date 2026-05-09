@@ -1,5 +1,3 @@
-local unpack = unpack or table.unpack -- Lua5.1/5.2+対応
-
 vim.g.mapleader = ' '
 
 vim.o.number = true
@@ -168,6 +166,8 @@ ambiwidth_add_list()
 
 vim.lsp.enable("lua_ls")
 vim.lsp.enable("gopls")
+
+vim.keymap.set("n", "grd", vim.diagnostic.open_float)
 
 -- 入力補完
 vim.opt.completeopt = { "menu", "menuone", "noselect","popup" }
