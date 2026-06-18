@@ -40,12 +40,16 @@ vim.keymap.set('t', '<C-l>', [[<C-\><C-n><C-w>l]])
 
 -- IME周りの設定 ------------------------------------------------------
 -- 挿入モードに入ったとき IME をオフにする
-vim.api.nvim_create_autocmd("InsertLeave", {
-	callback = function()
-		-- zenhan.exe を呼び出す（非同期で実行）
-		vim.fn.jobstart({ "zenhan.exe", "0" }) -- "0" が IME OFF
-	end,
-})
+local os = vim.uv.os_uname().sysname
+
+if os == "Windows_NT" then
+	vim.api.nvim_create_autocmd("InsertLeave", {
+		callback = function()
+			-- zenhan.exe を呼び出す（非同期で実行）
+			vim.fn.jobstart({ "zenhan.exe", "0" }) -- "0" が IME OFF
+		end,
+	})
+end
 
 -- Windows風に使うための設定（コピペ、保存） ------------------------------------------------------
 -- ctrl v でpasteモードにして貼り付けてnopasteに戻す
